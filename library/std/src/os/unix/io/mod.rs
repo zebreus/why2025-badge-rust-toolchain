@@ -92,10 +92,12 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
+#[cfg(not(target_os = "badgevms"))]
 use crate::io::{self, Stderr, StderrLock, Stdin, StdinLock, Stdout, StdoutLock, Write};
 #[stable(feature = "rust1", since = "1.0.0")]
 pub use crate::os::fd::*;
 #[allow(unused_imports)] // not used on all targets
+#[cfg(not(target_os = "badgevms"))]
 use crate::sys::cvt;
 
 // Tests for this module
@@ -103,6 +105,7 @@ use crate::sys::cvt;
 mod tests;
 
 #[unstable(feature = "stdio_swap", issue = "150667")]
+#[cfg(not(target_os = "badgevms"))]
 pub trait StdioExt: crate::sealed::Sealed {
     /// Redirects the stdio file descriptor to point to the file description underpinning `fd`.
     ///
@@ -158,6 +161,7 @@ pub trait StdioExt: crate::sealed::Sealed {
     fn take_fd(&mut self) -> io::Result<OwnedFd>;
 }
 
+#[cfg(not(target_os = "badgevms"))]
 macro io_ext_impl($stdio_ty:ty, $stdio_lock_ty:ty, $writer:literal) {
     #[unstable(feature = "stdio_swap", issue = "150667")]
     impl StdioExt for $stdio_ty {
@@ -197,10 +201,14 @@ macro io_ext_impl($stdio_ty:ty, $stdio_lock_ty:ty, $writer:literal) {
     }
 }
 
+#[cfg(not(target_os = "badgevms"))]
 io_ext_impl!(Stdout, StdoutLock<'_>, true);
+#[cfg(not(target_os = "badgevms"))]
 io_ext_impl!(Stdin, StdinLock<'_>, false);
+#[cfg(not(target_os = "badgevms"))]
 io_ext_impl!(Stderr, StderrLock<'_>, true);
 
+#[cfg(not(target_os = "badgevms"))]
 fn null_fd() -> io::Result<OwnedFd> {
     let null_dev = crate::fs::OpenOptions::new().read(true).write(true).open("/dev/null")?;
     Ok(null_dev.into())
@@ -208,6 +216,7 @@ fn null_fd() -> io::Result<OwnedFd> {
 
 /// Replaces the underlying file descriptor with the one from `other`.
 /// Does not set CLOEXEC.
+#[cfg(not(target_os = "badgevms"))]
 fn replace_stdio_fd(this: BorrowedFd<'_>, other: OwnedFd) -> io::Result<()> {
     cfg_select! {
         all(target_os = "wasi", target_env = "p1") => {

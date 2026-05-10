@@ -3,7 +3,7 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 
 #[cfg(any(
-    target_family = "unix",
+    all(target_family = "unix", not(target_os = "badgevms")),
     target_os = "hermit",
     target_os = "motor",
     all(target_vendor = "fortanix", target_env = "sgx"),
@@ -15,6 +15,10 @@
 mod common;
 
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        pub use unsupported::*;
+    }
     target_family = "unix" => {
         mod unix;
         pub use unix::*;

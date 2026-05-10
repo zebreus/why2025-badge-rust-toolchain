@@ -15,7 +15,7 @@ cfg_select! {
         pub use futex::Condvar;
     }
     any(
-        target_family = "unix",
+        all(target_family = "unix", not(target_os = "badgevms")),
         target_os = "teeos",
     ) => {
         mod pthread;

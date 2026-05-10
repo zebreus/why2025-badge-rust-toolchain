@@ -16,6 +16,8 @@ doc = false
 proc_macro = { path = "../proc_macro", public = true }
 profiler_builtins = { path = "../profiler_builtins", optional = true }
 std = { path = "../std", public = true }
+
+[target.'cfg(not(target_os = "badgevms"))'.dependencies]
 test = { path = "../test", public = true }
 
 # Forward features to the `std` crate as necessary

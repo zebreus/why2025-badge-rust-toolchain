@@ -33,7 +33,7 @@
 	shallow = true
 [submodule "library/backtrace"]
 	path = library/backtrace
-	url = https://github.com/rust-lang/backtrace-rs.git
+	url = git@github.com:zebreus/why2025-badge-backtrace-rs.git
 	shallow = true
 [submodule "src/tools/rustc-perf"]
 	path = src/tools/rustc-perf

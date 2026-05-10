@@ -15,7 +15,7 @@ cfg_select! {
         pub use futex::RwLock;
     }
     any(
-        target_family = "unix",
+        all(target_family = "unix", not(target_os = "badgevms")),
         all(target_os = "windows", target_vendor = "win7"),
         all(target_vendor = "fortanix", target_env = "sgx"),
         target_os = "xous",

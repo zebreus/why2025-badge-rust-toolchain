@@ -1,4 +1,8 @@
 cfg_select! {
+    target_os = "badgevms" => {
+        mod badgevms;
+        pub use badgevms::*;
+    }
     target_os = "hermit" => {
         mod hermit;
         pub use hermit::*;

@@ -1,4 +1,8 @@
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        use unsupported as imp;
+    }
     target_family = "unix" => {
         mod unix;
         use unix as imp;
@@ -29,7 +33,7 @@ mod env;
 pub use env::CommandEnvs;
 #[unstable(feature = "command_resolved_envs", issue = "149070")]
 pub use env::CommandResolvedEnvs;
-#[cfg(target_family = "unix")]
+#[cfg(all(target_family = "unix", not(target_os = "badgevms")))]
 pub use imp::getppid;
 pub use imp::{
     ChildPipe, Command, CommandArgs, EnvKey, ExitCode, ExitStatus, ExitStatusError, Process, Stdio,
@@ -41,6 +45,7 @@ pub use imp::{
         target_family = "unix",
         not(any(
             target_os = "espidf",
+            target_os = "badgevms",
             target_os = "horizon",
             target_os = "vita",
             target_os = "nuttx"
@@ -79,6 +84,7 @@ pub fn output(cmd: &mut Command) -> crate::io::Result<(ExitStatus, Vec<u8>, Vec<
         target_family = "unix",
         not(any(
             target_os = "espidf",
+            target_os = "badgevms",
             target_os = "horizon",
             target_os = "vita",
             target_os = "nuttx"

@@ -4,6 +4,10 @@ mod error;
 
 mod io_slice {
     cfg_select! {
+        target_os = "badgevms" => {
+            mod unsupported;
+            pub use unsupported::*;
+        }
         any(target_family = "unix", target_os = "hermit", target_os = "solid_asp3", target_os = "trusty", target_os = "wasi") => {
             mod iovec;
             pub use iovec::*;
@@ -25,6 +29,10 @@ mod io_slice {
 
 mod is_terminal {
     cfg_select! {
+        target_os = "badgevms" => {
+            mod unsupported;
+            pub use unsupported::*;
+        }
         any(target_family = "unix", target_os = "wasi") => {
             mod isatty;
             pub use isatty::*;
@@ -53,12 +61,14 @@ mod kernel_copy;
 #[cfg_attr(not(target_os = "linux"), allow(unused_imports))]
 #[cfg(all(
     target_family = "unix",
+    not(target_os = "badgevms"),
     not(any(target_os = "dragonfly", target_os = "vxworks", target_os = "rtems"))
 ))]
 pub use error::errno_location;
 #[cfg_attr(not(target_os = "linux"), allow(unused_imports))]
 #[cfg(any(
-    all(target_family = "unix", not(any(target_os = "vxworks", target_os = "rtems"))),
+    all(target_family = "unix", not(any(target_os = "badgevms", target_os = "vxworks", target_os = "rtems"))),
+    target_os = "badgevms",
     target_os = "wasi",
 ))]
 pub use error::set_errno;

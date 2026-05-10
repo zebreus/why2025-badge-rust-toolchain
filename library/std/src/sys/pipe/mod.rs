@@ -1,6 +1,10 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        pub use unsupported::{Pipe, pipe};
+    }
     unix => {
         mod unix;
         pub use unix::{Pipe, pipe};

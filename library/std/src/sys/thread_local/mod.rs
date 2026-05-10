@@ -27,6 +27,7 @@ cfg_select! {
     any(
         all(target_family = "wasm", not(target_feature = "atomics")),
         target_os = "uefi",
+        target_os = "badgevms",
         target_os = "zkvm",
         target_os = "trusty",
         target_os = "vexos",
@@ -97,6 +98,7 @@ pub(crate) mod guard {
                 all(target_os = "wasi", target_env = "p1", target_feature = "atomics")
             )),
             target_os = "uefi",
+            target_os = "badgevms",
             target_os = "zkvm",
             target_os = "trusty",
             target_os = "vexos",
@@ -146,7 +148,7 @@ pub(crate) mod key {
             all(
                 not(target_vendor = "apple"),
                 not(target_family = "wasm"),
-                target_family = "unix",
+                all(target_family = "unix", not(target_os = "badgevms")),
             ),
             all(not(target_thread_local), target_vendor = "apple"),
             target_os = "teeos",

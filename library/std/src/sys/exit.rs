@@ -112,6 +112,9 @@ pub fn exit(code: i32) -> ! {
             }
             crate::intrinsics::abort()
         }
+        target_os = "badgevms" => {
+            unsafe { why2025_badge_sys_bindings::exit(code as crate::ffi::c_int) }
+        }
         any(
             target_family = "unix",
             target_os = "wasi",

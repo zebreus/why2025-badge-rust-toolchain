@@ -125,6 +125,8 @@ pub mod windows;
 pub mod aix;
 #[cfg(target_os = "android")]
 pub mod android;
+#[cfg(target_os = "badgevms")]
+pub mod badgevms;
 #[cfg(target_os = "cygwin")]
 pub mod cygwin;
 #[cfg(target_os = "dragonfly")]

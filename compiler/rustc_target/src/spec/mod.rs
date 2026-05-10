@@ -1711,6 +1711,7 @@ supported_targets! {
     ("riscv32emc-unknown-none-elf", riscv32emc_unknown_none_elf),
 
     ("riscv32imac-unknown-none-elf", riscv32imac_unknown_none_elf),
+    ("riscv32imafc-unknown-badgevms", riscv32imafc_unknown_badgevms),
     ("riscv32imafc-unknown-none-elf", riscv32imafc_unknown_none_elf),
     ("riscv32imac-unknown-xous-elf", riscv32imac_unknown_xous_elf),
     ("riscv32gc-unknown-linux-gnu", riscv32gc_unknown_linux_gnu),
@@ -1983,6 +1984,7 @@ crate::target_spec_enum! {
         Aix = "aix",
         AmdHsa = "amdhsa",
         Android = "android",
+        Badgevms = "badgevms",
         Cuda = "cuda",
         Cygwin = "cygwin",
         Dragonfly = "dragonfly",

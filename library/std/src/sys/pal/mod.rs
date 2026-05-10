@@ -4,6 +4,10 @@
 #![allow(missing_debug_implementations)]
 
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        pub use self::unsupported::*;
+    }
     unix => {
         mod unix;
         pub use self::unix::*;

@@ -25,7 +25,7 @@ cfg_select! {
     }
     any(
         windows,
-        target_family = "unix",
+        all(target_family = "unix", not(target_os = "badgevms")),
         all(target_vendor = "fortanix", target_env = "sgx"),
         target_os = "solid_asp3",
         target_os = "xous",

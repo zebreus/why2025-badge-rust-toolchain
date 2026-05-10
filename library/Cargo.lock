@@ -347,6 +347,7 @@ dependencies = [
  "wasip1",
  "wasip2",
  "wasip3",
+ "why2025-badge-sys-bindings",
  "windows-link",
 ]
 
@@ -437,6 +438,13 @@ dependencies = [
  "rustc-std-workspace-alloc",
  "rustc-std-workspace-core",
  "wit-bindgen",
+]
+
+[[package]]
+name = "why2025-badge-sys-bindings"
+version = "0.2.0"
+dependencies = [
+ "rustc-std-workspace-core",
 ]
 
 [[package]]

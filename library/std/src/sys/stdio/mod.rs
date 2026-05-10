@@ -1,6 +1,10 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 
 cfg_select! {
+    target_os = "badgevms" => {
+        mod badgevms;
+        pub use badgevms::*;
+    }
     any(target_family = "unix", target_os = "hermit", target_os = "wasi") => {
         mod unix;
         pub use unix::*;

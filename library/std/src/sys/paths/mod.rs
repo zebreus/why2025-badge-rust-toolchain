@@ -30,6 +30,10 @@ cfg_select! {
         mod uefi;
         use uefi as imp;
     }
+    target_os = "badgevms" => {
+        mod unsupported;
+        use unsupported as imp;
+    }
     target_family = "unix" => {
         mod unix;
         use unix as imp;

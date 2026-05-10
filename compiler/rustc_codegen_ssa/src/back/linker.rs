@@ -861,7 +861,10 @@ impl<'a> Linker for GccLinker<'a> {
             for (sym, _) in symbols {
                 self.link_arg("--export").link_arg(sym);
             }
-        } else if crate_type == CrateType::Executable && !self.sess.target.is_like_solaris {
+        } else if crate_type == CrateType::Executable
+            && !self.sess.target.is_like_solaris
+            && self.sess.target.os != Os::Badgevms
+        {
             let res = try {
                 let mut f = File::create_buffered(&path)?;
                 writeln!(f, "{{")?;
@@ -1798,7 +1801,9 @@ pub(crate) fn exported_symbols(
     tcx: TyCtxt<'_>,
     crate_type: CrateType,
 ) -> Vec<(String, SymbolExportKind)> {
-    if let Some(ref exports) = tcx.sess.target.override_export_symbols {
+    if crate_type == CrateType::Executable
+        && let Some(ref exports) = tcx.sess.target.override_export_symbols
+    {
         return exports
             .iter()
             .map(|name| {

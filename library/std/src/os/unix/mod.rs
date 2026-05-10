@@ -41,6 +41,8 @@ mod platform {
     pub use crate::os::aix::*;
     #[cfg(target_os = "android")]
     pub use crate::os::android::*;
+    #[cfg(target_os = "badgevms")]
+    pub use crate::os::badgevms::*;
     #[cfg(target_os = "cygwin")]
     pub use crate::os::cygwin::*;
     #[cfg(target_vendor = "apple")]
@@ -88,11 +90,15 @@ mod platform {
 }
 
 pub mod ffi;
+#[cfg(not(target_os = "badgevms"))]
 pub mod fs;
 pub mod io;
+#[cfg(not(target_os = "badgevms"))]
 pub mod net;
+#[cfg(not(target_os = "badgevms"))]
 pub mod process;
 pub mod raw;
+#[cfg(not(target_os = "badgevms"))]
 pub mod thread;
 
 /// A prelude for conveniently writing platform-specific code.
@@ -105,23 +111,29 @@ pub mod prelude {
     pub use super::ffi::{OsStrExt, OsStringExt};
     #[doc(no_inline)]
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::fs::DirEntryExt;
     #[doc(no_inline)]
     #[stable(feature = "file_offset", since = "1.15.0")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::fs::FileExt;
     #[doc(no_inline)]
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::fs::{FileTypeExt, MetadataExt, OpenOptionsExt, PermissionsExt};
     #[doc(no_inline)]
     #[stable(feature = "rust1", since = "1.0.0")]
     pub use super::io::{AsFd, AsRawFd, BorrowedFd, FromRawFd, IntoRawFd, OwnedFd, RawFd};
     #[doc(no_inline)]
     #[unstable(feature = "unix_send_signal", issue = "141975")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::process::ChildExt;
     #[doc(no_inline)]
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::process::{CommandExt, ExitStatusExt};
     #[doc(no_inline)]
     #[stable(feature = "rust1", since = "1.0.0")]
+    #[cfg(not(target_os = "badgevms"))]
     pub use super::thread::JoinHandleExt;
 }

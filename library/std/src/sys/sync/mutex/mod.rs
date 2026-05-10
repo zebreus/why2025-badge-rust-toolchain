@@ -18,7 +18,7 @@ cfg_select! {
         pub use fuchsia::Mutex;
     }
     any(
-        target_family = "unix",
+        all(target_family = "unix", not(target_os = "badgevms")),
         target_os = "teeos",
     ) => {
         mod pthread;

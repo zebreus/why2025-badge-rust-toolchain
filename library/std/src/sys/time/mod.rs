@@ -1,4 +1,8 @@
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        use unsupported as imp;
+    }
     target_os = "hermit" => {
         mod hermit;
         use hermit as imp;

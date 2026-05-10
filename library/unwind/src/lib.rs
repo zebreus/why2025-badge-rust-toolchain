@@ -12,7 +12,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 
 // Force libc to be included even if unused. This is required by many platforms.
-#[cfg(not(all(windows, target_env = "msvc")))]
+#[cfg(all(not(target_os = "badgevms"), not(all(windows, target_env = "msvc"))))]
 extern crate libc as _;
 
 cfg_select! {
@@ -22,6 +22,7 @@ cfg_select! {
     any(
         target_os = "l4re",
         target_os = "none",
+        target_os = "badgevms",
         target_os = "espidf",
         target_os = "nuttx",
     ) => {

@@ -335,3 +335,8 @@ pub fn read_output(
 pub fn getpid() -> u32 {
     panic!("no pids on this platform")
 }
+
+#[allow(dead_code)]
+pub fn getppid() -> u32 {
+    panic!("no pids on this platform")
+}

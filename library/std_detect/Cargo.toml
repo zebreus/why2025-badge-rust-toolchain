@@ -19,7 +19,7 @@ maintenance = { status = "experimental" }
 core = { version = "1.0.0", package = 'rustc-std-workspace-core' }
 alloc = { version = "1.0.0", package = 'rustc-std-workspace-alloc' }
 
-[target.'cfg(not(windows))'.dependencies]
+[target.'cfg(all(not(windows), not(target_os = "badgevms")))'.dependencies]
 libc = { version = "0.2.0", default-features = false }
 
 [features]

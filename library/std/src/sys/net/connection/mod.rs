@@ -1,4 +1,8 @@
 cfg_select! {
+    target_os = "badgevms" => {
+        mod unsupported;
+        pub use unsupported::*;
+    }
     any(
         all(target_family = "unix", not(target_os = "l4re")),
         target_os = "windows",

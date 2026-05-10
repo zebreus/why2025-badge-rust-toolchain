@@ -16,7 +16,7 @@ alloc = { path = "../alloc" }
 core = { path = "../rustc-std-workspace-core", package = "rustc-std-workspace-core" }
 unwind = { path = "../unwind" }
 
-[target.'cfg(not(all(windows, target_env = "msvc")))'.dependencies]
+[target.'cfg(all(not(target_os = "badgevms"), not(all(windows, target_env = "msvc"))))'.dependencies]
 libc = { version = "0.2", default-features = false }
 
 [lints.rust.unexpected_cfgs]
