@@ -35,6 +35,9 @@ pub struct PackageMetadata {
     ///
     /// This includes *COPYRIGHT*, *NOTICE*, *AUTHOR*, *LICENSE*, and *LICENCE* files, case-insensitive.
     pub notices: BTreeMap<String, String>,
+    /// Directory to scan for notice files instead of the bootstrap vendor directory.
+    /// Used for out-of-tree path dependencies such as the BadgeVMS ABI bindings crate.
+    pub notice_path: Option<PathBuf>,
     /// If this is true, this dep is in the Rust Standard Library
     pub is_in_libstd: Option<bool>,
 }
@@ -100,6 +103,11 @@ pub fn get_metadata(
                     license: package.license.unwrap_or_else(|| String::from("Unspecified")),
                     authors: package.authors,
                     notices: BTreeMap::new(),
+                    notice_path: if package.source.is_none() {
+                        package_manifest_path.parent().map(PathBuf::from)
+                    } else {
+                        None
+                    },
                     is_in_libstd: None,
                 },
             );
@@ -120,8 +128,8 @@ fn load_important_files(
 ) -> Result<(), Error> {
     let name_version = format!("{}-{}", package.name, package.version);
     println!("Scraping notices for {}...", name_version);
-    let dep_vendor_path = vendor_root.join(name_version);
-    for entry in std::fs::read_dir(dep_vendor_path)? {
+    let dep_path = dep.notice_path.clone().unwrap_or_else(|| vendor_root.join(name_version));
+    for entry in std::fs::read_dir(dep_path)? {
         let entry = entry?;
         let metadata = entry.metadata()?;
         let path = entry.path();

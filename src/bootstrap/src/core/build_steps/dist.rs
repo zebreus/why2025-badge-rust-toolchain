@@ -1211,12 +1211,50 @@ impl Step for Src {
             &dst_src,
         );
 
+        // BadgeVMS std depends directly on the canonical raw ABI crate from the superproject.
+        // The relative path from `library/std/Cargo.toml` is `../../../why2025-badge-sys-bindings`,
+        // so the installed rust-src layout must contain it next to `rust/` under
+        // `lib/rustlib/src/`. Keep this as a packaged copy with std-workspace-relative paths;
+        // release artifacts must not symlink back to the superproject checkout.
+        copy_badgevms_sys_bindings_src(builder, &tarball.image_dir().join("lib/rustlib/src"));
+
         tarball.generate()
     }
 
     fn metadata(&self) -> Option<StepMetadata> {
         Some(StepMetadata::dist("src", TargetSelection::default()))
     }
+}
+
+fn copy_badgevms_sys_bindings_src(builder: &Builder<'_>, dst_src_root: &Path) {
+    if builder.config.dry_run() {
+        return;
+    }
+
+    let crate_src = builder.src.parent().unwrap().join("why2025-badge-sys-bindings");
+    if !crate_src.join("Cargo.toml").exists() {
+        panic!(
+            "missing canonical BadgeVMS ABI crate for rust-src packaging: {}",
+            crate_src.display()
+        );
+    }
+
+    let dst = dst_src_root.join("why2025-badge-sys-bindings");
+    t!(fs::create_dir_all(dst.join("src")));
+    copy_src_dirs(builder, &crate_src, &["src"], &[], &dst);
+
+    let manifest = t!(fs::read_to_string(crate_src.join("Cargo.toml")));
+    let rewritten = manifest.replace(
+        "../why2025-badge-rust-toolchain/library/rustc-std-workspace-core",
+        "../rust/library/rustc-std-workspace-core",
+    );
+    if rewritten == manifest {
+        panic!(
+            "BadgeVMS ABI manifest did not contain the expected rustc-std-workspace-core path: {}",
+            crate_src.join("Cargo.toml").display()
+        );
+    }
+    builder.create(&dst.join("Cargo.toml"), &rewritten);
 }
 
 /// Tarball for people who want to build rustc and other components from the source.
