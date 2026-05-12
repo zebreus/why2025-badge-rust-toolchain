@@ -36,6 +36,7 @@ pub struct Finder {
 /// Targets can be removed from this list during the usual release process bootstrap compiler bumps,
 /// when the newly-bumped stage 0 compiler now knows about the formerly-missing targets.
 const STAGE0_MISSING_TARGETS: &[&str] = &[
+    "riscv32imafc-unknown-badgevms",
     // just a dummy comment so the list doesn't get onelined
 ];
 
