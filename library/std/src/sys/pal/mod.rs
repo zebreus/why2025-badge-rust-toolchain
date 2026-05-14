@@ -6,7 +6,8 @@
 cfg_select! {
     target_os = "badgevms" => {
         mod unsupported;
-        pub use self::unsupported::*;
+        mod badgevms;
+        pub use self::badgevms::*;
     }
     unix => {
         mod unix;
