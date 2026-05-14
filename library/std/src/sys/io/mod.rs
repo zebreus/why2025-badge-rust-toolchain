@@ -30,8 +30,8 @@ mod io_slice {
 mod is_terminal {
     cfg_select! {
         target_os = "badgevms" => {
-            mod unsupported;
-            pub use unsupported::*;
+            mod badgevms;
+            pub use badgevms::*;
         }
         any(target_family = "unix", target_os = "wasi") => {
             mod isatty;
