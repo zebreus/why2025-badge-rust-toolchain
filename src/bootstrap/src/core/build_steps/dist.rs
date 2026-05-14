@@ -1244,16 +1244,24 @@ fn copy_badgevms_sys_bindings_src(builder: &Builder<'_>, dst_src_root: &Path) {
     copy_src_dirs(builder, &crate_src, &["src"], &[], &dst);
 
     let manifest = t!(fs::read_to_string(crate_src.join("Cargo.toml")));
-    let rewritten = manifest.replace(
-        "../why2025-badge-rust-toolchain/library/rustc-std-workspace-core",
-        "../rust/library/rustc-std-workspace-core",
+    let mut rewritten = manifest.replace(
+        "rustc-dep-of-std = []",
+        "rustc-dep-of-std = [\"dep:core\"]",
     );
     if rewritten == manifest {
         panic!(
-            "BadgeVMS ABI manifest did not contain the expected rustc-std-workspace-core path: {}",
+            "BadgeVMS ABI manifest did not contain the expected rustc-dep-of-std feature: {}",
             crate_src.join("Cargo.toml").display()
         );
     }
+    rewritten.push_str(
+        r#"
+[target.'cfg(target_os = "badgevms")'.dependencies.core]
+path = "../rust/library/rustc-std-workspace-core"
+optional = true
+package = "rustc-std-workspace-core"
+"#,
+    );
     builder.create(&dst.join("Cargo.toml"), &rewritten);
 }
 
