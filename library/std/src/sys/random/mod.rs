@@ -103,8 +103,8 @@ cfg_select! {
         pub use zkvm::fill_bytes;
     }
     target_os = "badgevms" => {
-        mod unsupported;
-        pub use unsupported::{fill_bytes, hashmap_random_keys};
+        mod badgevms;
+        pub use badgevms::{fill_bytes, hashmap_random_keys};
     }
     any(
         all(target_family = "wasm", target_os = "unknown"),

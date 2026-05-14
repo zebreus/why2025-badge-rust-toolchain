@@ -5,6 +5,7 @@
 
 cfg_select! {
     target_os = "badgevms" => {
+        #[allow(dead_code)]
         mod unsupported;
         mod badgevms;
         pub use self::badgevms::*;

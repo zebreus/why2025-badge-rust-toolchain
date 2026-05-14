@@ -7,8 +7,8 @@ pub mod common;
 
 cfg_select! {
     target_os = "badgevms" => {
-        mod unsupported;
-        use unsupported as imp;
+        mod badgevms;
+        use badgevms as imp;
     }
     any(target_family = "unix", target_os = "wasi") => {
         mod unix;
