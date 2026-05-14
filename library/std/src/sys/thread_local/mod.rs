@@ -27,7 +27,6 @@ cfg_select! {
     any(
         all(target_family = "wasm", not(target_feature = "atomics")),
         target_os = "uefi",
-        target_os = "badgevms",
         target_os = "zkvm",
         target_os = "trusty",
         target_os = "vexos",
@@ -35,6 +34,11 @@ cfg_select! {
         mod no_threads;
         pub use no_threads::{EagerStorage, LazyStorage, thread_local_inner};
         pub(crate) use no_threads::{LocalPointer, local_pointer};
+    }
+    target_os = "badgevms" => {
+        mod os;
+        pub use os::{Storage, thread_local_inner, value_align};
+        pub(crate) use os::{LocalPointer, local_pointer};
     }
     target_thread_local => {
         mod native;
@@ -98,7 +102,6 @@ pub(crate) mod guard {
                 all(target_os = "wasi", target_env = "p1", target_feature = "atomics")
             )),
             target_os = "uefi",
-            target_os = "badgevms",
             target_os = "zkvm",
             target_os = "trusty",
             target_os = "vexos",
@@ -120,6 +123,7 @@ pub(crate) mod guard {
         any(
             target_os = "hermit",
             target_os = "xous",
+            target_os = "badgevms",
         ) => {
             // `std` is the only runtime, so it just calls the destructor functions
             // itself when the time comes.
@@ -188,6 +192,14 @@ pub(crate) mod key {
             pub(crate) use xous::destroy_tls;
             pub(super) use xous::{Key, get, set};
             use xous::{create, destroy};
+        }
+        target_os = "badgevms" => {
+            mod racy;
+            mod badgevms;
+            pub(super) use racy::LazyKey;
+            pub(super) use badgevms::{Key, get, set};
+            pub(crate) use badgevms::destroy_current_thread_tls;
+            use badgevms::{create, destroy};
         }
         target_os = "motor" => {
             mod racy;

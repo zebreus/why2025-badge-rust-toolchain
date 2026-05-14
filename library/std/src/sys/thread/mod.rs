@@ -49,8 +49,8 @@ cfg_select! {
         pub use unsupported::{Thread, current_os_id, set_name, yield_now, DEFAULT_MIN_STACK_SIZE};
     }
     target_os = "badgevms" => {
-        mod unsupported;
-        pub use unsupported::{Thread, available_parallelism, current_os_id, set_name, sleep, yield_now, DEFAULT_MIN_STACK_SIZE};
+        mod badgevms;
+        pub use badgevms::{Thread, available_parallelism, current_os_id, set_name, sleep, yield_now, DEFAULT_MIN_STACK_SIZE};
     }
     any(target_family = "unix", target_os = "wasi") => {
         mod unix;

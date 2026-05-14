@@ -4,7 +4,6 @@ use crate::ffi::{CString, OsStr, OsString};
 use crate::num::NonZero;
 use crate::path::Path;
 use crate::process::StdioPipes;
-use crate::sync::{Mutex, MutexGuard};
 use crate::sys::fs::File;
 use crate::sys::pal::process as pal_process;
 use crate::{fmt, io};
@@ -116,7 +115,7 @@ impl Command {
         }
 
         let pid = pal_process::spawn(&path, &mut argv)?;
-        let id = process_registry().register(pid);
+        let id = pal_process::register_task(pid);
 
         Ok((
             Process { pid, id, status: None },
@@ -264,7 +263,7 @@ impl From<u8> for ExitCode {
 
 pub struct Process {
     pid: pal_process::Pid,
-    id: u64,
+    id: pal_process::TaskId,
     status: Option<ExitStatus>,
 }
 
@@ -283,14 +282,8 @@ impl Process {
         }
 
         loop {
-            if process_registry().take_completed(self.id) {
-                return Ok(self.record_completed());
-            }
-
-            let Some(pid) = pal_process::wait(true, 0)? else {
-                continue;
-            };
-            process_registry().record_observed_pid(pid);
+            pal_process::wait_for_task(self.id)?;
+            return Ok(self.record_completed());
         }
     }
 
@@ -299,20 +292,10 @@ impl Process {
             return Ok(Some(status));
         }
 
-        if process_registry().take_completed(self.id) {
+        if pal_process::try_wait_for_task(self.id)? {
             return Ok(Some(self.record_completed()));
         }
-
-        let Some(pid) = pal_process::wait(false, 0)? else {
-            return Ok(None);
-        };
-        process_registry().record_observed_pid(pid);
-
-        if process_registry().take_completed(self.id) {
-            Ok(Some(self.record_completed()))
-        } else {
-            Ok(None)
-        }
+        Ok(None)
     }
 
     fn record_completed(&mut self) -> ExitStatus {
@@ -370,58 +353,4 @@ fn cstring_from_os_str(value: &OsStr) -> io::Result<CString> {
     CString::new(value.as_encoded_bytes()).map_err(|_| {
         io::const_error!(io::ErrorKind::InvalidInput, "process argument contained NUL")
     })
-}
-
-struct ProcessRegistry {
-    next_id: u64,
-    pending: Vec<(pal_process::Pid, Vec<u64>)>,
-    completed: Vec<u64>,
-}
-
-impl ProcessRegistry {
-    const fn new() -> Self {
-        Self { next_id: 1, pending: Vec::new(), completed: Vec::new() }
-    }
-
-    fn register(&mut self, pid: pal_process::Pid) -> u64 {
-        let id = self.next_id;
-        self.next_id = self.next_id.wrapping_add(1).max(1);
-
-        if let Some((_, ids)) = self.pending.iter_mut().find(|(pending_pid, _)| *pending_pid == pid)
-        {
-            ids.push(id);
-        } else {
-            self.pending.push((pid, vec![id]));
-        }
-
-        id
-    }
-
-    fn record_observed_pid(&mut self, pid: pal_process::Pid) {
-        let Some(position) = self.pending.iter().position(|(pending_pid, _)| *pending_pid == pid)
-        else {
-            return;
-        };
-
-        let id = self.pending[position].1.remove(0);
-        if self.pending[position].1.is_empty() {
-            self.pending.remove(position);
-        }
-        self.completed.push(id);
-    }
-
-    fn take_completed(&mut self, id: u64) -> bool {
-        if let Some(position) = self.completed.iter().position(|completed_id| *completed_id == id) {
-            self.completed.swap_remove(position);
-            true
-        } else {
-            false
-        }
-    }
-}
-
-static PROCESS_REGISTRY: Mutex<ProcessRegistry> = Mutex::new(ProcessRegistry::new());
-
-fn process_registry() -> MutexGuard<'static, ProcessRegistry> {
-    PROCESS_REGISTRY.lock().unwrap()
 }

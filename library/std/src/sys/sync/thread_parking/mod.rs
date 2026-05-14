@@ -35,6 +35,10 @@ cfg_select! {
         mod xous;
         pub use xous::Parker;
     }
+    target_os = "badgevms" => {
+        mod badgevms;
+        pub use badgevms::Parker;
+    }
     any(
         all(target_family = "unix", not(target_os = "badgevms")),
         target_os = "teeos",
