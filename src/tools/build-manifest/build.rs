@@ -48,8 +48,27 @@ fn collect_rustc_targets() -> RustcTargets {
     rustc_targets
 }
 
+fn add_extra_targets(rustc_targets: &mut RustcTargets) {
+    println!("cargo:rerun-if-env-changed=BUILD_MANIFEST_EXTRA_TARGETS");
+
+    let Some(extra_targets) = std::env::var_os("BUILD_MANIFEST_EXTRA_TARGETS") else {
+        return;
+    };
+
+    for target in extra_targets.to_string_lossy().split(',') {
+        let target = target.trim();
+        if target.is_empty() {
+            continue;
+        }
+        if !rustc_targets.targets.iter().any(|known| known == target) {
+            rustc_targets.targets.push(target.to_owned());
+        }
+    }
+}
+
 fn main() {
-    let targets = collect_rustc_targets();
+    let mut targets = collect_rustc_targets();
+    add_extra_targets(&mut targets);
 
     // Verify we ended up with a reasonable target list.
     assert!(targets.hosts.len() >= 10);

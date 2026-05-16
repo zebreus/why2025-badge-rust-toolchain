@@ -1245,23 +1245,26 @@ fn copy_badgevms_sys_bindings_src(builder: &Builder<'_>, dst_src_root: &Path) {
 
     let manifest = t!(fs::read_to_string(crate_src.join("Cargo.toml")));
     let mut rewritten = manifest.replace(
-        "rustc-dep-of-std = []",
-        "rustc-dep-of-std = [\"dep:core\"]",
+        "path = \"../why2025-badge-rust-toolchain/library/rustc-std-workspace-core\"",
+        "path = \"../rust/library/rustc-std-workspace-core\"",
     );
     if rewritten == manifest {
         panic!(
-            "BadgeVMS ABI manifest did not contain the expected rustc-dep-of-std feature: {}",
+            "BadgeVMS ABI manifest did not contain the expected rustc-std-workspace-core path: {}",
             crate_src.join("Cargo.toml").display()
         );
     }
-    rewritten.push_str(
-        r#"
-[target.'cfg(target_os = "badgevms")'.dependencies.core]
-path = "../rust/library/rustc-std-workspace-core"
-optional = true
-package = "rustc-std-workspace-core"
-"#,
-    );
+    if !rewritten.contains("rustc-dep-of-std = [\"dep:core\"]") {
+        let with_feature =
+            rewritten.replace("rustc-dep-of-std = []", "rustc-dep-of-std = [\"dep:core\"]");
+        if with_feature == rewritten {
+            panic!(
+                "BadgeVMS ABI manifest did not contain the expected rustc-dep-of-std feature: {}",
+                crate_src.join("Cargo.toml").display()
+            );
+        }
+        rewritten = with_feature;
+    }
     builder.create(&dst.join("Cargo.toml"), &rewritten);
 }
 
